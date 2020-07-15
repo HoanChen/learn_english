@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:learn_english/bean/BeanFactory.dart';
 import 'package:learn_english/bean/ResultBean.dart';
@@ -25,15 +23,20 @@ class HttpUtil {
   Future<R> post<R, O>(api, data) =>
       request<R, O>(api, data: data, method: 'post');
 
+  Future<R> put<R, O>(api, data) =>
+      request<R, O>(api, data: data, method: 'put');
+
   // 支持Get Post
   Future<R> request<R, O>(String api, {data, method}) async {
     var response;
     if (method == 'post') {
-      response = await _dio.post('api',
+      response = await _dio.post(api,
           data: data,
           options: data is FormData
               ? Options(contentType: 'application/x-www-form-urlencoded')
               : null);
+    } else if (method == 'put') {
+      response = await _dio.put(api, data: data);
     } else {
       response = await _dio.get(api, queryParameters: data);
     }

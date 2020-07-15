@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/http/HttpUtil.dart';
+import 'package:learn_english/widget/EditDialog.dart';
 
 class WordPage extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class WordPage extends StatefulWidget {
 class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   var _list = [];
   var _pageNum = 1;
-  var _pageSize = 1;
+  var _pageSize = 10;
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -21,8 +22,16 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
             onRefresh: _loadData,
             child: ListView.builder(
               itemBuilder: (BuildContext context, int index) {
+                WordBean bean = _list[index];
                 return ListTile(
-                  title: Text(_list[index].contentEN),
+                  title: Text('${bean.contentEN} => ${bean.contentCN}'),
+                  onTap: () => {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => EditDialog(word: bean),
+                    )
+                  },
                 );
               },
               itemCount: _list.length,

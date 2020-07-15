@@ -17,10 +17,4 @@ class WordBean {
     data['contentCN'] = this.contentCN;
     return data;
   }
-
-  @override
-  String toString() {
-    return '''$contentEN
-$contentCN''';
-  }
 }
