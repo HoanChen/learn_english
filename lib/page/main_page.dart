@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:learn_english/common/MyColors.dart';
+import 'package:learn_english/page/setting_page.dart';
 import 'package:learn_english/page/study_page.dart';
 import 'package:learn_english/page/word_page.dart';
 
@@ -11,11 +13,11 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> {
-  final _pagesTitles = ['开始学习', '单词管理'];
+  final _pagesTitles = ['开始学习', '单词管理', '设置'];
   var _currentIndex = 0;
   PageController _pageController;
-  final Color _defaultColor = Color(0xFF4d4d4d);
-  final Color _activeColor = Color(0xFF1d87ed);
+  final Color _defaultColor = MyColors.black;
+  final Color _activeColor = MyColors.accentColor;
 
   @override
   void initState() {
@@ -32,10 +34,7 @@ class MainPageState extends State<MainPage> {
       ),
       body: PageView(
         controller: _pageController,
-        children: <Widget>[StudyPage(), WordPage()],
-        onPageChanged: (index) {
-          log('-----------onPageChanged:$index');
-        },
+        children: <Widget>[StudyPage(), WordPage(), SettingPage()],
         physics: NeverScrollableScrollPhysics(),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -74,6 +73,20 @@ class MainPageState extends State<MainPage> {
                 '单词',
                 style: TextStyle(
                     color: _currentIndex == 1 ? _activeColor : _defaultColor),
+              )),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.settings,
+                color: _defaultColor,
+              ),
+              activeIcon: Icon(
+                Icons.settings,
+                color: _activeColor,
+              ),
+              title: Text(
+                '设置',
+                style: TextStyle(
+                    color: _currentIndex == 2 ? _activeColor : _defaultColor),
               )),
         ],
         showSelectedLabels: true,

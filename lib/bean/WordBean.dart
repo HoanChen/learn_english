@@ -4,6 +4,12 @@ class WordBean {
   String contentEN;
   String contentCN;
 
+  WordBean(int id, String contentEN, String contentCN) {
+    this.id = id;
+    this.contentEN = contentEN;
+    this.contentCN = contentCN;
+  }
+
   WordBean.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     contentEN = json['contentEN'];

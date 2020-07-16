@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/http/HttpUtil.dart';
@@ -25,13 +26,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                 WordBean bean = _list[index];
                 return ListTile(
                   title: Text('${bean.contentEN} => ${bean.contentCN}'),
-                  onTap: () => {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => EditDialog(word: bean),
-                    )
-                  },
+                  onTap: () => {_editWord(context, bean)},
                 );
               },
               itemCount: _list.length,
@@ -47,9 +42,30 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       });
     } else {
       _pageNum--;
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: new Text(response.message)));
     }
   }
 
   @override
   bool get wantKeepAlive => true;
+
+  _editWord(BuildContext context, WordBean bean) async {
+    var cnStr = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => EditDialog(word: bean),
+    );
+    if (cnStr != null) {
+      var response = await HttpUtil().put<ResultBean, int>(
+          '/api/v1/word', WordBean(bean.id, bean.contentEN, cnStr));
+      if (response.isSuccess()) {
+        setState(() {
+          bean.contentCN = cnStr;
+        });
+      } else {
+        _editWord(context, bean);
+      }
+    }
+  }
 }

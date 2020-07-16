@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
@@ -56,7 +54,7 @@ class StudyPageState extends State<StudyPage>
         ),
         _showCN
             ? SizedBox()
-            : _buildButton('提示一下', Color(0xFFFF935C), () {
+            : _buildButton('提示一下', MyColors.orange, () {
                 setState(() {
                   _showCN = true;
                 });
@@ -69,8 +67,8 @@ class StudyPageState extends State<StudyPage>
     var response =
         await HttpUtil().get<ResultListBean, WordBean>('/api/v1/word/random');
     setState(() {
-      _showCN = false;
       if (response.isSuccess()) {
+        _showCN = false;
         _word = response.data[0];
       } else {
         _word = null;

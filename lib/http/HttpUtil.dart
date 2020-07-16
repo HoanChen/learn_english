@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:dio/dio.dart';
 import 'package:learn_english/bean/BeanFactory.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/common/Constants.dart';
+import 'package:learn_english/http/NetUtil.dart';
 
 class HttpUtil {
   static final HttpUtil _instance = HttpUtil._internal();
@@ -29,24 +32,38 @@ class HttpUtil {
   // 支持Get Post
   Future<R> request<R, O>(String api, {data, method}) async {
     var response;
+    DioError error;
     if (method == 'post') {
-      response = await _dio.post(api,
-          data: data,
-          options: data is FormData
-              ? Options(contentType: 'application/x-www-form-urlencoded')
-              : null);
+      response = await _dio
+          .post(api,
+              data: data,
+              options: data is FormData
+                  ? Options(contentType: 'application/x-www-form-urlencoded')
+                  : null)
+          .catchError((e) {
+        error = e;
+      });
     } else if (method == 'put') {
-      response = await _dio.put(api, data: data);
+      response = await _dio.put(api, data: data).catchError((e) {
+        error = e;
+      });
     } else {
-      response = await _dio.get(api, queryParameters: data);
+      response = await _dio.get(api, queryParameters: data).catchError((e) {
+        error = e;
+      });
     }
+    var json = response != null ? response.data : null;
     var r = R.toString();
     if (r == ResultBean.CLASS_NAME) {
-      return ResultBean<O>.fromJson(response.data) as R;
+      return ResultBean<O>.fromJson(json, error) as R;
     } else if (r == ResultListBean.CLASS_NAME) {
-      return ResultListBean<O>.fromJson(response.data) as R;
+      return ResultListBean<O>.fromJson(json, error) as R;
     } else if (r == O.toString()) {
-      return BeanFactory.generateObject<R>(response.data);
+      if (error == null) {
+        return BeanFactory.generateObject<R>(json);
+      } else {
+        return throw error;
+      }
     } else {
       throw Exception('请在请求方法上设置正确泛型！');
     }

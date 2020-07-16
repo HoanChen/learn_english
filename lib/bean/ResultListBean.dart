@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import 'package:learn_english/http/NetUtil.dart';
+
 import 'BeanFactory.dart';
 
 class ResultListBean<O> {
@@ -8,15 +11,20 @@ class ResultListBean<O> {
   String serviceVersion;
   List<O> data;
 
-  ResultListBean.fromJson(Map<String, dynamic> json) {
-    code = json['code'];
-    message = json['message'];
-    serviceVersion = json['serviceVersion'];
-    if (json['data'] != null) {
-      data = List<O>();
-      (json['data'] as List).forEach((element) {
-        data.add(BeanFactory.generateObject<O>(element));
-      });
+  ResultListBean.fromJson(Map<String, dynamic> json, DioError error) {
+    if (error != null) {
+      code = NetUtil.errorCode(error);
+      message = NetUtil.errorMessage(error);
+    } else {
+      code = json['code'];
+      message = json['message'];
+      serviceVersion = json['serviceVersion'];
+      if (json['data'] != null) {
+        data = List<O>();
+        (json['data'] as List).forEach((element) {
+          data.add(BeanFactory.generateObject<O>(element));
+        });
+      }
     }
   }
 
