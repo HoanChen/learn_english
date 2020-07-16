@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:dio/dio.dart';
 import 'package:learn_english/bean/BeanFactory.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/common/Constants.dart';
-import 'package:learn_english/http/NetUtil.dart';
 
 class HttpUtil {
   static final HttpUtil _instance = HttpUtil._internal();

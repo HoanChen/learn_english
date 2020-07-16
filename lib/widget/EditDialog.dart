@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learn_english/common/MyColors.dart';
-
-import '../bean/ResultBean.dart';
 import '../bean/WordBean.dart';
-import '../http/HttpUtil.dart';
 
 class EditDialog extends Dialog {
   final WordBean word;
