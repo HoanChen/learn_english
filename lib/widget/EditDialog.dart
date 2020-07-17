@@ -8,7 +8,8 @@ class EditDialog extends Dialog {
   EditDialog({Key key, @required this.word}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final _textEditController = TextEditingController(text: word.contentCN);
+    final _textEditController = TextEditingController(
+        text: word.id != null ? word.contentCN : word.contentEN ?? '');
     return SingleChildScrollView(
         child: Material(
             type: MaterialType.transparency,
@@ -28,7 +29,9 @@ class EditDialog extends Dialog {
                         alignment: AlignmentDirectional.centerEnd,
                         children: <Widget>[
                           Center(
-                            child: Text(word.contentEN),
+                            child: Text(word.id != null
+                                ? '编辑汉译【${word.contentEN}】'
+                                : '新增单词'),
                           )
                         ],
                       ),
@@ -37,7 +40,9 @@ class EditDialog extends Dialog {
                       color: Color(0xffe0e0e0),
                       height: 1.0,
                     ),
-                    _buildInputText(_textEditController),
+                    _buildInputText(_textEditController, (text) {
+                      Navigator.pop(context, text);
+                    }),
                     Container(
                         margin: EdgeInsets.only(right: 10.0),
                         child: new Row(
@@ -47,7 +52,11 @@ class EditDialog extends Dialog {
                               Navigator.pop(context, null);
                             }),
                             _buildBottomButton(context, true, () {
-                              Navigator.pop(context, _textEditController.text);
+                              if (_textEditController.text.isEmpty) {
+                              } else {
+                                Navigator.pop(
+                                    context, _textEditController.text);
+                              }
                             })
                           ],
                         )),
@@ -68,27 +77,32 @@ class EditDialog extends Dialog {
         ),
       );
 
-  _buildInputText(TextEditingController controller) => Container(
-      constraints: BoxConstraints(minHeight: 130.0),
-      child: Padding(
-        padding: EdgeInsets.only(left: 30.0, right: 30.0),
-        child: Center(
-          child: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 15),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(3), //边角为5
-                ),
-                borderSide: BorderSide(
-                  color: MyColors.accentColor, //边线颜色为白色
-                  width: 1, //边线宽度为2
+  _buildInputText(TextEditingController controller,
+          ValueChanged<String> valueChanged) =>
+      Container(
+          constraints: BoxConstraints(minHeight: 130.0),
+          child: Padding(
+            padding: EdgeInsets.only(left: 30.0, right: 30.0),
+            child: Center(
+              child: TextField(
+                controller: controller,
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+                keyboardType: TextInputType.text,
+                onSubmitted: valueChanged,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 15),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(3), //边角为5
+                    ),
+                    borderSide: BorderSide(
+                      color: MyColors.accentColor, //边线颜色为白色
+                      width: 1, //边线宽度为2
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
-      ));
+          ));
 }

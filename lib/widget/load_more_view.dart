@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_english/common/MyColors.dart';
 
-///https://www.jianshu.com/p/270357939247
 class LoadMoreView extends StatelessWidget {
   final LoadMoreStatus loadMoreStatus;
 
@@ -11,7 +10,15 @@ class LoadMoreView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: <Widget>[_bulidProgress(), Text('正在加载')],
+      children: <Widget>[
+        _bulidProgress(),
+        Padding(
+            child: Text(
+              _getText(),
+              style: TextStyle(fontSize: 14.0),
+            ),
+            padding: EdgeInsets.all(10.0)),
+      ],
       mainAxisAlignment: MainAxisAlignment.center,
     );
   }
@@ -25,6 +32,19 @@ class LoadMoreView extends StatelessWidget {
           valueColor: AlwaysStoppedAnimation(MyColors.accentColor),
         ),
       ));
+
+  String _getText() {
+    switch (loadMoreStatus) {
+      case LoadMoreStatus.STATU_IDEL:
+        return '上拉加载更多🚀';
+      case LoadMoreStatus.STATU_LOADING:
+        return '正在加载中🚚';
+      case LoadMoreStatus.STATU_NO_MORE:
+        return '已到世界的尽头⛔';
+      default:
+        return '';
+    }
+  }
 }
 
-enum LoadMoreStatus { STATU_LOADING, STATU_COMPLETED, STATU_IDEL }
+enum LoadMoreStatus { STATU_LOADING, STATU_NO_MORE, STATU_IDEL }

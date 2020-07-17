@@ -12,7 +12,7 @@ class HttpUtil {
     if (_dio == null) {
       _dio =
           Dio(BaseOptions(baseUrl: Constants.BASE_URL, connectTimeout: 15000));
-      _dio.interceptors.add(LogInterceptor(responseBody: true));
+      _dio.interceptors.add(LogInterceptor(requestBody: true,responseBody: true));
     }
   }
 
@@ -56,10 +56,10 @@ class HttpUtil {
     } else if (r == ResultListBean.CLASS_NAME) {
       return ResultListBean<O>.fromJson(json, error) as R;
     } else if (r == O.toString()) {
-      if (error == null) {
-        return BeanFactory.generateObject<R>(json);
-      } else {
+      if (error != null) {
         return throw error;
+      } else {
+        return BeanFactory.generateObject<R>(json);
       }
     } else {
       throw Exception('请在请求方法上设置正确泛型！');
