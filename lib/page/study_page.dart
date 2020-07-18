@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/common/MyColors.dart';
@@ -64,14 +65,15 @@ class StudyPageState extends State<StudyPage>
   }
 
   Future<void> _loadData() async {
-    var response =
-        await HttpUtil().get<ResultListBean, WordBean>('/api/v1/word/random');
+    var response = await HttpUtil.getInstance()
+        .get<ResultListBean, WordBean>('/api/v1/word/random');
     setState(() {
       if (response.isSuccess()) {
         _showCN = false;
         _word = response.data[0];
       } else {
         _word = null;
+        Fluttertoast.showToast(msg: response.message);
       }
     });
   }

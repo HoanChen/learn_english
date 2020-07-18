@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-class NetUtil {
+class ResultUtil {
   ///错误信息
   static errorMessage(DioError error) {
     switch (error.type) {
@@ -15,7 +15,15 @@ class NetUtil {
         return '响应超时';
       // When the server response, but with a incorrect status, such as 404, 503...
       case DioErrorType.RESPONSE:
-        return '请求失败';
+        {
+          if (error.response != null) {
+            switch (error.response.statusCode) {
+              case 401: //未携带token
+                return "没有登录信息";
+            }
+          }
+          return '请求失败';
+        }
       // When the request is cancelled, dio will throw a error with this type.
       case DioErrorType.CANCEL:
         return '请求已取消';

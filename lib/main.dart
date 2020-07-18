@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:learn_english/page/login_page.dart';
+import 'package:learn_english/page/splash_page.dart';
 import 'common/MyColors.dart';
 import 'page/main_page.dart';
 
@@ -30,7 +32,11 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MainPage(),
+      home: SplashPage(),
+      routes: <String, WidgetBuilder>{
+        './main': (BuildContext context) => MainPage(),
+        './login': (BuildContext context) => LoginPage(),
+      },
     );
   }
 }

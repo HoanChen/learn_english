@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:learn_english/http/NetUtil.dart';
+import 'package:learn_english/http/ResultUtil.dart';
 
 import 'BeanFactory.dart';
 
@@ -13,8 +13,8 @@ class ResultListBean<O> {
 
   ResultListBean.fromJson(Map<String, dynamic> json, DioError error) {
     if (error != null) {
-      code = NetUtil.errorCode(error);
-      message = NetUtil.errorMessage(error);
+      code = ResultUtil.errorCode(error);
+      message = ResultUtil.errorMessage(error);
     } else {
       code = json['code'];
       message = json['message'];

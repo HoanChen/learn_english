@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:learn_english/bean/BeanFactory.dart';
-import 'package:learn_english/http/NetUtil.dart';
+import 'package:learn_english/http/ResultUtil.dart';
 
 class ResultBean<O> {
   static const CLASS_NAME = 'ResultBean<dynamic>';
@@ -10,10 +10,15 @@ class ResultBean<O> {
   String serviceVersion;
   O data;
 
+  ResultBean.error(String message) {
+    this.code = '000000';
+    this.message = message;
+  }
+
   ResultBean.fromJson(Map<String, dynamic> json, DioError error) {
     if (error != null) {
-      code = NetUtil.errorCode(error);
-      message = NetUtil.errorMessage(error);
+      code = ResultUtil.errorCode(error);
+      message = ResultUtil.errorMessage(error);
     } else {
       code = json['code'];
       message = json['message'];

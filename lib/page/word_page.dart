@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
@@ -157,8 +158,8 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       ]));
 
   Future<void> _loadData() async {
-    var response = await HttpUtil().get<ResultListBean, WordBean>(
-        '/api/v1/word/words/$_dateStr/$_pageNum/$_pageSize');
+    var response = await HttpUtil.getInstance().get<ResultListBean, WordBean>(
+        '/api/v1/word/words/$_pageNum/$_pageSize/$_dateStr');
     if (response.isSuccess()) {
       setState(() {
         if (_pageNum == 1) {
@@ -173,8 +174,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       });
     } else {
       _pageNum--;
-      Scaffold.of(context)
-          .showSnackBar(SnackBar(content: new Text(response.message)));
+      Fluttertoast.showToast(msg: response.message);
       setState(() {
         _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
       });
@@ -188,8 +188,9 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       builder: (context) => EditDialog(word: bean),
     );
     if (cnStr != null) {
-      var response = await HttpUtil().put<ResultBean, int>(
+      var response = await HttpUtil.getInstance().put<ResultBean, int>(
           '/api/v1/word', WordBean(id: bean.id, contentCN: cnStr));
+      Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
         setState(() {
           bean.contentCN = cnStr;
@@ -208,11 +209,10 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
     );
     if (enStr != null) {
       var wordBean = WordBean(contentEN: enStr);
-      var response =
-          await HttpUtil().post<ResultBean, int>('/api/v1/word', wordBean);
+      var response = await HttpUtil.getInstance()
+          .post<ResultBean, int>('/api/v1/word', wordBean);
+      Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: new Text(response.message)));
       } else {
         _addWord(context, wordBean);
       }
