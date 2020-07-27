@@ -5,7 +5,7 @@ import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/common/MyColors.dart';
-import 'package:learn_english/http/HttpUtil.dart';
+import 'package:learn_english/net/HttpUtil.dart';
 import 'package:learn_english/widget/EditDialog.dart';
 import 'package:learn_english/widget/load_more_view.dart';
 
@@ -26,6 +26,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   var _pageSize = 10;
   var _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
   ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +44,8 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         }
       }
     });
+    _loadData();
+    _loadData();
     _loadData();
   }
 
@@ -120,7 +123,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                 context: context,
                 initialDate: _date,
                 firstDate: DateTime(2020, 5),
-                lastDate: new DateTime.now(),
+                lastDate: DateTime.now(),
               ).then((DateTime dateTime) {
                 if (dateTime != null) {
                   setState(() {

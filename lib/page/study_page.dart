@@ -1,10 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
+import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
-import 'package:learn_english/http/HttpUtil.dart';
+import 'package:learn_english/net/HttpUtil.dart';
 
 class StudyPage extends StatefulWidget {
   @override
@@ -15,6 +17,7 @@ class StudyPageState extends State<StudyPage>
     with AutomaticKeepAliveClientMixin {
   WordBean _word;
   var _showCN = false;
+
   @override
   void initState() {
     super.initState();

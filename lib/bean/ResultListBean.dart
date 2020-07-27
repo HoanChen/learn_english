@@ -1,14 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:learn_english/http/ResultUtil.dart';
+import 'package:learn_english/net/ResultUtil.dart';
 
 import 'BeanFactory.dart';
 
 class ResultListBean<O> {
   static const CLASS_NAME = 'ResultListBean<dynamic>';
 
-  String code;
-  String message;
-  String serviceVersion;
+  String code,message,serviceVersion;
   List<O> data;
 
   ResultListBean.fromJson(Map<String, dynamic> json, DioError error) {

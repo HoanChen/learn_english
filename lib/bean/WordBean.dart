@@ -1,8 +1,7 @@
 class WordBean {
   static const CLASS_NAME = 'WordBean';
   int id;
-  String contentEN;
-  String contentCN;
+  String contentEN,contentCN;
 
   WordBean({this.id, this.contentEN, this.contentCN});
 

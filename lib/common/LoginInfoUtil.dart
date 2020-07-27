@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:learn_english/bean/TokenBean.dart';
+import 'package:learn_english/bean/TokensBean.dart';
 import 'package:learn_english/bean/login_Info.dart';
 
 import 'Constants.dart';
@@ -7,19 +9,24 @@ import 'StorageUtil.dart';
 
 class LoginInfoUtil {
   static final LoginInfoUtil _instance = LoginInfoUtil._internal();
+
   factory LoginInfoUtil() => _instance;
 
   LoginInfoUtil._internal();
 
   LoginInfoBean _info;
-  Future<bool> checkLoginInfo() async {
+
+  Future<bool> isLogin() async {
     var infoOK = false;
     if (_info == null) {
       await StorageUtil.getString(Constants.LOGIN_INFO).then((String value) {
-        if (value != null && value != '') {
+        if (value != null && value.isNotEmpty) {
           _info = LoginInfoBean.fromJson(json.decode(value));
           infoOK = true;
         }
+      }).catchError((e) {
+        exitLogin();
+        infoOK = false;
       });
     } else {
       infoOK = true;
@@ -32,8 +39,18 @@ class LoginInfoUtil {
   }
 
   Future<bool> setLoginInfo(LoginInfoBean infoBean) async {
-    this._info = infoBean;
+    _info = infoBean;
     return StorageUtil.set(Constants.LOGIN_INFO, infoBean.toJson());
+  }
+
+  setToken(TokensBean data) async {
+    if (_info != null) {
+      _info.accessToken = data?.accessToken;
+      _info.refreshToken = data?.refreshToken;
+      return StorageUtil.set(Constants.LOGIN_INFO, _info.toJson());
+    } else {
+      return false;
+    }
   }
 
   Future<bool> exitLogin() async {
@@ -41,5 +58,7 @@ class LoginInfoUtil {
     return StorageUtil.set(Constants.LOGIN_INFO, '');
   }
 
-  getToken() => 'Bearer ${_info.accessToken}';
+  TokenBean getToken() => _info.accessToken;
+
+  TokenBean getRefreshToken() => _info.refreshToken;
 }

@@ -1,22 +1,11 @@
-class LoginInfoBean {
-  String accessToken;
-  String refreshToken;
-  String expiration;
+import 'TokensBean.dart';
+
+class LoginInfoBean extends TokensBean {
+  static const CLASS_NAME = 'LoginInfoBean';
   RoleBean role;
   UserBean userBean;
 
-  LoginInfoBean(
-      {this.accessToken,
-      this.refreshToken,
-      this.expiration,
-      this.role,
-      this.userBean});
-  static const CLASS_NAME = 'LoginInfoBean';
-
-  LoginInfoBean.fromJson(Map<String, dynamic> json) {
-    accessToken = json['accessToken'];
-    refreshToken = json['refreshToken'];
-    expiration = json['expiration'];
+  LoginInfoBean.fromJson(Map<String, dynamic> json) : super.fromJson(json){
     role = json['role'] != null ? new RoleBean.fromJson(json['role']) : null;
     userBean = json['userBean'] != null
         ? new UserBean.fromJson(json['userBean'])
@@ -25,9 +14,8 @@ class LoginInfoBean {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['accessToken'] = this.accessToken;
-    data['refreshToken'] = this.refreshToken;
-    data['expiration'] = this.expiration;
+    data['accessToken'] = this.accessToken.toJson();
+    data['refreshToken'] = this.refreshToken.toJson();
     if (this.role != null) {
       data['role'] = this.role.toJson();
     }
@@ -41,8 +29,6 @@ class LoginInfoBean {
 class RoleBean {
   int code;
   String name;
-
-  RoleBean({this.code, this.name});
 
   RoleBean.fromJson(Map<String, dynamic> json) {
     code = json['code'];
@@ -59,12 +45,7 @@ class RoleBean {
 
 class UserBean {
   int id;
-  String userName;
-  String phone;
-  String email;
-  String avatar;
-
-  UserBean({this.id, this.userName, this.phone, this.email, this.avatar});
+  String userName, phone, email, avatar;
 
   UserBean.fromJson(Map<String, dynamic> json) {
     id = json['id'];

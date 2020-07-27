@@ -1,11 +1,15 @@
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/bean/login_Info.dart';
 
+import 'TokensBean.dart';
+
 class BeanFactory {
   static O generateObject<O>(json) {
     switch (O.toString()) {
       case LoginInfoBean.CLASS_NAME:
         return LoginInfoBean.fromJson(json) as O;
+      case TokensBean.CLASS_NAME:
+        return TokensBean.fromJson(json) as O;
       case WordBean.CLASS_NAME:
         return WordBean.fromJson(json) as O;
       default:

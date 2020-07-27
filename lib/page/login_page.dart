@@ -1,13 +1,14 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/login_Info.dart';
-import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/common/LoginInfoUtil.dart';
-import 'package:learn_english/http/HttpUtil.dart';
+import 'package:learn_english/common/MyColors.dart';
+import 'package:learn_english/net/HttpUtil.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -22,6 +23,7 @@ class LoginState extends State<LoginPage> {
 
   FocusNode _phoneNumFocusNode = FocusNode();
   FocusNode _passwordFocusNode = FocusNode();
+
   Future<Null> focusNodeListener() async {
     if (_phoneNumFocusNode.hasFocus) {
       _passwordFocusNode.unfocus();
@@ -35,6 +37,7 @@ class LoginState extends State<LoginPage> {
   var _isShowPwdClear = false;
   var _isPwdObscure = true;
   var _loading = false;
+
   @override
   void initState() {
     _phoneNumController.addListener(() {
@@ -253,9 +256,8 @@ class LoginState extends State<LoginPage> {
       'phone': _phoneNum,
       'password': base64Encode(utf8.encode(password)),
     });
-    var response = await HttpUtil.getInstance().post<ResultBean, LoginInfoBean>(
-        '/api/v1/user/login', formData,
-        needToken: false);
+    var response = await HttpUtil.getInstance()
+        .post<ResultBean, LoginInfoBean>('/api/v1/user/login', formData);
     var msg = response.message;
     if (response.isSuccess()) {
       var success = await LoginInfoUtil().setLoginInfo(response.data);

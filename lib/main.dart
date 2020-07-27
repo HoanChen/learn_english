@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:learn_english/page/login_page.dart';
 import 'package:learn_english/page/splash_page.dart';
+
 import 'common/MyColors.dart';
 import 'page/main_page.dart';
 
@@ -9,10 +10,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  static final _navigatorKey = GlobalKey<NavigatorState>();
+  static NavigatorState get navigator => _navigatorKey.currentState;
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.

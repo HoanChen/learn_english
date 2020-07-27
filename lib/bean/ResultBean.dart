@@ -1,13 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:learn_english/bean/BeanFactory.dart';
-import 'package:learn_english/http/ResultUtil.dart';
+import 'package:learn_english/net/ResultUtil.dart';
 
 class ResultBean<O> {
   static const CLASS_NAME = 'ResultBean<dynamic>';
 
-  String code;
-  String message;
-  String serviceVersion;
+  String code,message,serviceVersion;
   O data;
 
   ResultBean.error(String message) {
