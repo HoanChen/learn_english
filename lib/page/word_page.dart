@@ -4,8 +4,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
-import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/widget/DateSwitch.dart';
 import 'package:learn_english/widget/EditDialog.dart';
 import 'package:learn_english/widget/load_more_view.dart';
 
@@ -17,10 +17,7 @@ class WordPage extends StatefulWidget {
 class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-
-  DateTime _date;
   String _dateStr;
-  var _dateType = 0; //0 时间最小，2 时间最大
   var _list = [];
   var _pageNum = 1;
   var _pageSize = 10;
@@ -30,7 +27,6 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    _setDateField(DateTime.now());
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -44,9 +40,6 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         }
       }
     });
-    _loadData();
-    _loadData();
-    _loadData();
   }
 
   @override
@@ -63,7 +56,13 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
           ),
         ),
         body: Column(children: [
-          _buildTopDate(),
+          DateSwitch(
+            callback: (dateStr) {
+              _dateStr = dateStr;
+              _pageNum = 1;
+              _loadData();
+            },
+          ),
           Container(
             color: Colors.black12,
             height: 1.0,
@@ -93,72 +92,6 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                   )))
         ]));
   }
-
-  _buildTopDate() => Padding(
-      padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Visibility(
-            visible: _dateType != 0,
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  int _year = _date.year;
-                  int _month = _date.month;
-                  if (_date.month == 1) {
-                    _year -= 1;
-                    _month = 12;
-                  } else {
-                    _month -= 1;
-                  }
-                  _setDateField(DateTime(_year, _month));
-                });
-                _pageNum = 1;
-                _loadData();
-              },
-              icon: Icon(Icons.chevron_left),
-            )),
-        GestureDetector(
-            onTap: () {
-              showDatePicker(
-                context: context,
-                initialDate: _date,
-                firstDate: DateTime(2020, 5),
-                lastDate: DateTime.now(),
-              ).then((DateTime dateTime) {
-                if (dateTime != null) {
-                  setState(() {
-                    _setDateField(dateTime);
-                  });
-                  _pageNum = 1;
-                  _loadData();
-                }
-              });
-            },
-            child: Text(
-              _dateStr,
-              style: TextStyle(fontSize: 15.0, color: MyColors.accentColor),
-            )),
-        Visibility(
-            visible: _dateType != 2,
-            child: IconButton(
-              onPressed: () {
-                setState(() {
-                  int _year = _date.year;
-                  int _month = _date.month;
-                  if (_date.month == 12) {
-                    _year += 1;
-                    _month = 1;
-                  } else {
-                    _month += 1;
-                  }
-                  _setDateField(DateTime(_year, _month));
-                });
-                _pageNum = 1;
-                _loadData();
-              },
-              icon: Icon(Icons.chevron_right),
-            )),
-      ]));
 
   Future<void> _loadData() async {
     var response = await HttpUtil.getInstance().get<ResultListBean, WordBean>(
@@ -219,20 +152,6 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       } else {
         _addWord(context, wordBean);
       }
-    }
-  }
-
-  void _setDateField(DateTime dateTime) {
-    _date = dateTime;
-    _dateStr =
-        "${_date.year.toString()}-${_date.month.toString().padLeft(2, '0')}";
-    var now = DateTime.now();
-    if (_date.year == now.year && _date.month == now.month) {
-      _dateType = 2;
-    } else if (_date.year == 2020 && _date.month == 5) {
-      _dateType = 0;
-    } else {
-      _dateType = 1;
     }
   }
 }

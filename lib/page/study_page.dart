@@ -1,12 +1,11 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
-import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/widget/DateSwitch.dart';
 
 class StudyPage extends StatefulWidget {
   @override
@@ -15,14 +14,9 @@ class StudyPage extends StatefulWidget {
 
 class StudyPageState extends State<StudyPage>
     with AutomaticKeepAliveClientMixin {
+  String _dateStr;
   WordBean _word;
   var _showCN = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +24,12 @@ class StudyPageState extends State<StudyPage>
     return Container(
       margin: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
       child: Column(children: [
+        DateSwitch(
+          callback: (dateStr) {
+            _dateStr = dateStr;
+            _loadData();
+          },
+        ),
         SizedBox(
             height: 150.0,
             child: Align(
@@ -68,8 +68,9 @@ class StudyPageState extends State<StudyPage>
   }
 
   Future<void> _loadData() async {
-    var response = await HttpUtil.getInstance()
-        .get<ResultListBean, WordBean>('/api/v1/word/random');
+    var response = await HttpUtil.getInstance().get<ResultListBean, WordBean>(
+        '/api/v1/word/random',
+        params: {'monthDate': _dateStr});
     setState(() {
       if (response.isSuccess()) {
         _showCN = false;
