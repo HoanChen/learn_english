@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
+import 'package:learn_english/bean/WordMarkBean.dart';
+import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
 import 'package:learn_english/widget/DateSwitch.dart';
@@ -41,16 +44,14 @@ class StudyPageState extends State<StudyPage>
         Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 100.0),
             child: Text(
-              _showCN ? '翻译：${_word != null ? _word.contentCN ?? '' : ''}' : '',
+              _showCN ? '${_word != null ? _word.contentCN ?? '' : ''}' : '',
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
             )),
         _buildButton(_showCN ? '下一个' : '我认识', MyColors.accentColor, () {
           if (_showCN) {
             _loadData();
           } else {
-            setState(() {
-              _showCN = true;
-            });
+            if (_word != null) _markWord(_word.id, false);
           }
         }),
         SizedBox(
@@ -59,20 +60,18 @@ class StudyPageState extends State<StudyPage>
         _showCN
             ? SizedBox()
             : _buildButton('提示一下', MyColors.orange, () {
-                setState(() {
-                  _showCN = true;
-                });
+                if (_word != null) _markWord(_word.id, true);
               }),
       ]),
     );
   }
 
   Future<void> _loadData() async {
-    var response = await HttpUtil.getInstance().get<ResultListBean, WordBean>(
+    var response = await HttpUtil().get<ResultListBean, WordBean>(
         '/api/v1/word/random',
         params: {'monthDate': _dateStr});
     setState(() {
-      if (response.isSuccess()) {
+      if (response.isSuccess() && response.data.isNotEmpty) {
         _showCN = false;
         _word = response.data[0];
       } else {
@@ -98,4 +97,20 @@ class StudyPageState extends State<StudyPage>
             text,
             style: TextStyle(color: Colors.white, fontSize: 18.0),
           ));
+
+  _markWord(int id, bool markUp) async {
+    var response = await HttpUtil().post<ResultBean, Object>(
+        '/api/v1/word/mark',
+        WordMarkBean(
+            userId: LoginInfoUtil().getInfo().userBean.id,
+            wordId: id,
+            markUp: markUp));
+    setState(() {
+      if (response.isSuccess()) {
+        _showCN = true;
+      } else {
+        Fluttertoast.showToast(msg: response.message);
+      }
+    });
+  }
 }

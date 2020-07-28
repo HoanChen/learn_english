@@ -22,9 +22,9 @@ class TokenInterceptor extends InterceptorsWrapper {
         if (LoginInfoUtil().getRefreshToken().expired()) {
           onExpired();
         } else {
-          HttpUtil().dio().lock();
+          HttpUtil().lock();
           var token = await _refreshToken();
-          HttpUtil().dio().unlock();
+          HttpUtil().unlock();
           if (token != null) {
             options.headers.addAll({'authorization': 'Bearer ${token.token}'});
           } else {
@@ -63,7 +63,10 @@ class TokenInterceptor extends InterceptorsWrapper {
           }
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      //TODO 超时/网络异常等情况处理
+      print('-----_refreshToken Error:${e.toString()}');
+    }
     return null;
   }
 

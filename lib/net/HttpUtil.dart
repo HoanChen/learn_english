@@ -91,8 +91,9 @@ class HttpUtil {
     _cancelToken = CancelToken();
   }
 
-  Dio dio() => _dio;
+  void lock() => _dio.lock();
 
+  void unlock() => _dio.unlock();
 
   Dio _tokenDio;
 
