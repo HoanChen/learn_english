@@ -256,7 +256,7 @@ class LoginState extends State<LoginPage> {
       'phone': _phoneNum,
       'password': base64Encode(utf8.encode(password)),
     });
-    var response = await HttpUtil.getInstance()
+    var response = await HttpUtil()
         .post<ResultBean, LoginInfoBean>('/api/v1/user/login', formData);
     var msg = response.message;
     if (response.isSuccess()) {

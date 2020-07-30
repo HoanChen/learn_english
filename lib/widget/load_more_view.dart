@@ -24,7 +24,7 @@ class LoadMoreView extends StatelessWidget {
   }
 
   _bulidProgress() => Visibility(
-      visible: loadMoreStatus == LoadMoreStatus.STATU_LOADING ? true : false,
+      visible: loadMoreStatus == LoadMoreStatus.LOADING ? true : false,
       child: SizedBox(
         height: 20.0,
         width: 20.0,
@@ -35,11 +35,11 @@ class LoadMoreView extends StatelessWidget {
 
   String _getText() {
     switch (loadMoreStatus) {
-      case LoadMoreStatus.STATU_IDEL:
+      case LoadMoreStatus.IDLE:
         return '上拉加载更多🚀';
-      case LoadMoreStatus.STATU_LOADING:
+      case LoadMoreStatus.LOADING:
         return '正在加载中🚚';
-      case LoadMoreStatus.STATU_NO_MORE:
+      case LoadMoreStatus.NO_MORE:
         return '已到世界的尽头⛔';
       default:
         return '';
@@ -47,4 +47,4 @@ class LoadMoreView extends StatelessWidget {
   }
 }
 
-enum LoadMoreStatus { STATU_LOADING, STATU_NO_MORE, STATU_IDEL }
+enum LoadMoreStatus { IDLE, LOADING, NO_MORE }

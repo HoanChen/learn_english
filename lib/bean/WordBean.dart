@@ -1,7 +1,7 @@
 class WordBean {
   static const CLASS_NAME = 'WordBean';
   int id;
-  String contentEN,contentCN;
+  String contentEN, contentCN;
 
   WordBean({this.id, this.contentEN, this.contentCN});
 
@@ -11,13 +11,10 @@ class WordBean {
     contentCN = json['contentCN'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['contentEN'] = this.contentEN;
-    data['contentCN'] = this.contentCN;
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['id'] = this.id
+    ..['contentEN'] = this.contentEN
+    ..['contentCN'] = this.contentCN;
 
   @override
   String toString() => toJson().toString();

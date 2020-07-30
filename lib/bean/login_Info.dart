@@ -5,25 +5,17 @@ class LoginInfoBean extends TokensBean {
   RoleBean role;
   UserBean userBean;
 
-  LoginInfoBean.fromJson(Map<String, dynamic> json) : super.fromJson(json){
-    role = json['role'] != null ? new RoleBean.fromJson(json['role']) : null;
-    userBean = json['userBean'] != null
-        ? new UserBean.fromJson(json['userBean'])
-        : null;
+  LoginInfoBean.fromJson(Map<String, dynamic> json) : super.fromJson(json) {
+    role = json['role'] != null ? RoleBean.fromJson(json['role']) : null;
+    userBean =
+        json['userBean'] != null ? UserBean.fromJson(json['userBean']) : null;
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['accessToken'] = this.accessToken.toJson();
-    data['refreshToken'] = this.refreshToken.toJson();
-    if (this.role != null) {
-      data['role'] = this.role.toJson();
-    }
-    if (this.userBean != null) {
-      data['userBean'] = this.userBean.toJson();
-    }
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['accessToken'] = this.accessToken.toJson()
+    ..['refreshToken'] = this.refreshToken.toJson()
+    ..['role'] = this.role != null ? this.role.toJson() : null
+    ..['userBean'] = this.userBean != null ? this.userBean.toJson() : null;
 }
 
 class RoleBean {
@@ -35,12 +27,9 @@ class RoleBean {
     name = json['name'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['name'] = this.name;
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['code'] = this.code
+    ..['name'] = this.name;
 }
 
 class UserBean {
@@ -55,13 +44,10 @@ class UserBean {
     avatar = json['avatar'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['userName'] = this.userName;
-    data['phone'] = this.phone;
-    data['email'] = this.email;
-    data['avatar'] = this.avatar;
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['id'] = this.id
+    ..['userName'] = this.userName
+    ..['phone'] = this.phone
+    ..['email'] = this.email
+    ..['avatar'] = this.avatar;
 }

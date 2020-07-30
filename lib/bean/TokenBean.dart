@@ -8,14 +8,10 @@ class TokenBean {
     expiration = json['expiration'];
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['token'] = this.token;
-    data['expiration'] = this.expiration;
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['token'] = this.token
+    ..['expiration'] = this.expiration;
 
-  bool expired() {
-    return DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(expiration));
-  }
+  bool expired() =>
+      DateTime.now().isAfter(DateTime.fromMillisecondsSinceEpoch(expiration));
 }

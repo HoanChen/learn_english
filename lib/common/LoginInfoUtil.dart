@@ -34,26 +34,24 @@ class LoginInfoUtil {
     return infoOK;
   }
 
-  LoginInfoBean getInfo() {
-    return _info;
-  }
+  LoginInfoBean getInfo() => _info;
 
-  Future<bool> setLoginInfo(LoginInfoBean infoBean) async {
+  Future<bool> setLoginInfo(LoginInfoBean infoBean) {
     _info = infoBean;
     return StorageUtil.set(Constants.LOGIN_INFO, infoBean.toJson());
   }
 
-  setToken(TokensBean data) async {
+  Future<bool> setToken(TokensBean data) async {
+    var ok = false;
     if (_info != null) {
       _info.accessToken = data?.accessToken;
       _info.refreshToken = data?.refreshToken;
-      return StorageUtil.set(Constants.LOGIN_INFO, _info.toJson());
-    } else {
-      return false;
+      ok = await StorageUtil.set(Constants.LOGIN_INFO, _info.toJson());
     }
+    return ok;
   }
 
-  Future<bool> exitLogin() async {
+  Future<bool> exitLogin() {
     this._info = null;
     return StorageUtil.set(Constants.LOGIN_INFO, '');
   }

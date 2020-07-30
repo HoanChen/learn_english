@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/TokenBean.dart';
 import 'package:learn_english/bean/TokensBean.dart';
+import 'package:learn_english/common/Constants.dart';
 import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/net/HttpUtil.dart';
 
@@ -41,18 +42,15 @@ class TokenInterceptor extends InterceptorsWrapper {
 
   Future<TokenBean> _refreshToken() async {
     var token = LoginInfoUtil().getToken();
-    if (!token.expired()) {
-      return token;
-    }
+    if (!token.expired()) return token;
     var refreshToken = LoginInfoUtil().getRefreshToken();
-    if (refreshToken.expired()) {
-      return null;
-    }
+    if (refreshToken.expired()) return null;
     try {
-      var response = await HttpUtil().tokenDio().post('/api/v1/user/token',
-          data: FormData.fromMap({
-            'refreshToken': refreshToken.token,
-          }));
+      var response =
+          await HttpUtil().newDio(Constants.BASE_URL).post('/api/v1/user/token',
+              data: FormData.fromMap({
+                'refreshToken': refreshToken.token,
+              }));
       var resJson = response != null ? response.data : null;
       if (resJson != null) {
         var resultBean = ResultBean<TokensBean>.fromJson(resJson, null);
@@ -81,7 +79,7 @@ class TokenInterceptor extends InterceptorsWrapper {
   }
 
   void onExpired() {
-    HttpUtil.getInstance().cancel();
+    HttpUtil().cancel();
     LoginInfoUtil().exitLogin().then((value) =>
         MyApp.navigator.pushNamedAndRemoveUntil('./login', (route) => false));
   }

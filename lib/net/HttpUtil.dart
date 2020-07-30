@@ -15,16 +15,15 @@ class HttpUtil {
   HttpUtil._internal() {
     if (_dio == null) {
       _dio =
-          Dio(BaseOptions(baseUrl: Constants.BASE_URL, connectTimeout: 15000));
-      _dio.interceptors.add(TokenInterceptor());
-      _dio.interceptors
-          .add(LogInterceptor(requestBody: false, responseBody: true));
+          Dio(BaseOptions(baseUrl: Constants.BASE_URL, connectTimeout: 15000))
+            ..interceptors.add(TokenInterceptor())
+            ..interceptors.add(LogInterceptor(
+                request: false,
+                requestHeader: false,
+                requestBody: true,
+                responseHeader: false,
+                responseBody: true));
     }
-  }
-
-  static HttpUtil getInstance({String baseUrl}) {
-    if (baseUrl != null) _instance._dio.options.baseUrl = baseUrl;
-    return _instance;
   }
 
   Future<O> simpleGet<O>(api, {params}) => request<O, O>(api, data: params);
@@ -42,8 +41,7 @@ class HttpUtil {
   Future<R> request<R, O>(String api, {data, method}) async {
     Options options;
     if (data is FormData) {
-      Options options = Options();
-      options.contentType = Headers.formUrlEncodedContentType;
+      options = Options()..contentType = Headers.formUrlEncodedContentType;
     }
     var response;
     DioError error;
@@ -95,15 +93,19 @@ class HttpUtil {
 
   void unlock() => _dio.unlock();
 
-  Dio _tokenDio;
+  Dio _newDio;
 
-  Dio tokenDio() {
-    if (_tokenDio == null) {
-      _tokenDio =
-          Dio(BaseOptions(baseUrl: Constants.BASE_URL, connectTimeout: 15000));
-      _tokenDio.interceptors
-          .add(LogInterceptor(requestBody: false, responseBody: true));
+  Dio newDio(String baseUrl) {
+    if (_newDio == null) {
+      _newDio = Dio(BaseOptions(connectTimeout: 15000))
+        ..interceptors.add(LogInterceptor(
+            request: false,
+            requestHeader: false,
+            requestBody: true,
+            responseHeader: false,
+            responseBody: true));
     }
-    return _tokenDio;
+    _newDio.options.baseUrl = baseUrl;
+    return _newDio;
   }
 }

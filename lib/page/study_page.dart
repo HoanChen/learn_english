@@ -20,27 +20,33 @@ class StudyPageState extends State<StudyPage>
   String _dateStr;
   WordBean _word;
   var _showCN = false;
+  var _revertEnable = false;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Container(
-      margin: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-      child: Column(children: [
-        DateSwitch(
-          callback: (dateStr) {
-            _dateStr = dateStr;
-            _loadData();
-          },
-        ),
-        SizedBox(
-            height: 150.0,
-            child: Align(
-                alignment: FractionalOffset.bottomCenter,
-                child: Text(
-                  _word != null ? _word.contentEN : '',
-                  style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w500),
-                ))),
+    var children = [
+      DateSwitch(
+        dateStr: _dateStr,
+        callback: (dateStr) {
+          _dateStr = dateStr;
+          _loadData();
+        },
+      ),
+      SizedBox(
+          height: 150.0,
+          child: Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: Text(
+                _word != null ? _word.contentEN : '',
+                style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w500),
+              )))
+    ];
+    if (_word != null) {
+      if (_revertEnable) {
+        children.insert(0, _buildTopTips());
+      }
+      children.addAll([
         Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 100.0),
             child: Text(
@@ -61,8 +67,13 @@ class StudyPageState extends State<StudyPage>
             ? SizedBox()
             : _buildButton('提示一下', MyColors.orange, () {
                 if (_word != null) _markWord(_word.id, true);
-              }),
-      ]),
+              })
+      ]);
+    } else {
+      children.add(Text('暂无数据'));
+    }
+    return Container(
+      child: Column(children: children),
     );
   }
 
@@ -106,6 +117,7 @@ class StudyPageState extends State<StudyPage>
             wordId: id,
             markUp: markUp));
     setState(() {
+      _revertEnable = !markUp;
       if (response.isSuccess()) {
         _showCN = true;
       } else {
@@ -113,4 +125,23 @@ class StudyPageState extends State<StudyPage>
       }
     });
   }
+
+  Widget _buildTopTips() => Container(
+      color: Colors.black12,
+      child: Padding(
+          padding: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
+          child: Row(
+            children: <Widget>[
+              Text('确定认得该词？'),
+              GestureDetector(
+                onTap: () {
+                  if (_word != null) _markWord(_word.id, true);
+                },
+                child: Text(
+                  '记错了',
+                  style: TextStyle(color: MyColors.accentColor),
+                ),
+              )
+            ],
+          )));
 }

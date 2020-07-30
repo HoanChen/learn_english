@@ -4,13 +4,10 @@ class WordMarkBean {
 
   WordMarkBean({this.userId, this.wordId, this.markUp});
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['userId'] = this.userId;
-    data['wordId'] = this.wordId;
-    data['markUp'] = this.markUp;
-    return data;
-  }
+  Map<String, dynamic> toJson() => Map<String, dynamic>()
+    ..['userId'] = this.userId
+    ..['wordId'] = this.wordId
+    ..['markUp'] = this.markUp;
 
   @override
   String toString() => toJson().toString();

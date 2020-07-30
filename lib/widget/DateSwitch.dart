@@ -4,8 +4,10 @@ import 'package:learn_english/common/MyColors.dart';
 
 class DateSwitch extends StatefulWidget {
   final Function callback;
+  final String dateStr;
 
-  DateSwitch({Key key, @required this.callback}) : super(key: key);
+  DateSwitch({Key key, this.dateStr, @required this.callback})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _DateSwitchState();
@@ -18,9 +20,13 @@ class _DateSwitchState extends State<DateSwitch> {
 
   @override
   void initState() {
-    _setDateField(DateTime.now());
+    if (widget.dateStr == null) {
+      _setDateField(DateTime.now());
+      widget.callback(_dateStr);
+    } else {
+      _setDateField(DateTime.parse('${widget.dateStr}-01'));
+    }
     super.initState();
-    widget.callback(_dateStr);
   }
 
   @override

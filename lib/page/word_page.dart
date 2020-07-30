@@ -21,7 +21,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   var _list = [];
   var _pageNum = 1;
   var _pageSize = 10;
-  var _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
+  var _loadMoreStatus = LoadMoreStatus.IDLE;
   ScrollController _scrollController;
 
   @override
@@ -31,9 +31,9 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        if (_loadMoreStatus == LoadMoreStatus.STATU_IDEL) {
+        if (_loadMoreStatus == LoadMoreStatus.IDLE) {
           setState(() {
-            _loadMoreStatus = LoadMoreStatus.STATU_LOADING;
+            _loadMoreStatus = LoadMoreStatus.LOADING;
           });
           _pageNum++;
           _loadData();
@@ -74,15 +74,19 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                     _loadData();
                   },
                   child: ListView.builder(
+                    physics: AlwaysScrollableScrollPhysics(),
                     controller: _scrollController,
                     itemCount: _list.length + 1,
                     itemBuilder: (BuildContext context, int index) {
-                      if (index == _list.length) {
+                      if (_list.isEmpty) {
+                        return Container(
+                            height: 400, child: Center(child: Text('暂无数据')));
+                      } else if (index == _list.length) {
                         return LoadMoreView(loadMoreStatus: _loadMoreStatus);
                       } else {
                         WordBean bean = _list[index];
                         return ListTile(
-                          title: Text('${bean.contentEN} => ${bean.contentCN}'),
+                          title: Text('${bean.contentEN}  ${bean.contentCN}'),
                           onTap: () {
                             _editWord(context, bean);
                           },
@@ -94,17 +98,17 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   }
 
   Future<void> _loadData() async {
-    var response = await HttpUtil.getInstance().get<ResultListBean, WordBean>(
+    var response = await HttpUtil().get<ResultListBean, WordBean>(
         '/api/v1/word/words/$_pageNum/$_pageSize/$_dateStr');
     if (response.isSuccess()) {
       setState(() {
         if (_pageNum == 1) {
-          _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
+          _loadMoreStatus = LoadMoreStatus.IDLE;
           _list.clear();
         } else if (response.data.length < 10) {
-          _loadMoreStatus = LoadMoreStatus.STATU_NO_MORE;
+          _loadMoreStatus = LoadMoreStatus.NO_MORE;
         } else {
-          _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
+          _loadMoreStatus = LoadMoreStatus.IDLE;
         }
         _list.addAll(response.data);
       });
@@ -112,7 +116,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       _pageNum--;
       Fluttertoast.showToast(msg: response.message);
       setState(() {
-        _loadMoreStatus = LoadMoreStatus.STATU_IDEL;
+        _loadMoreStatus = LoadMoreStatus.IDLE;
       });
     }
   }
@@ -124,7 +128,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       builder: (context) => EditDialog(word: bean),
     );
     if (cnStr != null) {
-      var response = await HttpUtil.getInstance().put<ResultBean, int>(
+      var response = await HttpUtil().put<ResultBean, int>(
           '/api/v1/word', WordBean(id: bean.id, contentCN: cnStr));
       Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
@@ -145,8 +149,8 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
     );
     if (enStr != null) {
       var wordBean = WordBean(contentEN: enStr);
-      var response = await HttpUtil.getInstance()
-          .post<ResultBean, int>('/api/v1/word', wordBean);
+      var response =
+          await HttpUtil().post<ResultBean, int>('/api/v1/word', wordBean);
       Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
       } else {
