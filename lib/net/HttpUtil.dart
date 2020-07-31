@@ -36,6 +36,9 @@ class HttpUtil {
   Future<R> put<R, O>(api, data) =>
       request<R, O>(api, data: data, method: 'put');
 
+  Future<R> delete<R, O>(api, {params}) =>
+      request<R, O>(api, data: params, method: 'delete');
+
   CancelToken _cancelToken = CancelToken();
 
   Future<R> request<R, O>(String api, {data, method}) async {
@@ -54,6 +57,12 @@ class HttpUtil {
     } else if (method == 'put') {
       response = await _dio
           .put(api, data: data, options: options, cancelToken: _cancelToken)
+          .catchError((e) {
+        error = e;
+      });
+    } else if (method == 'delete') {
+      response = await _dio
+          .delete(api, data: data, options: options, cancelToken: _cancelToken)
           .catchError((e) {
         error = e;
       });

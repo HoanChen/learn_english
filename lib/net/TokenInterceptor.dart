@@ -64,6 +64,7 @@ class TokenInterceptor extends InterceptorsWrapper {
     } catch (e) {
       //TODO 超时/网络异常等情况处理
       print('-----_refreshToken Error:${e.toString()}');
+      return token;
     }
     return null;
   }

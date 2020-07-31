@@ -32,11 +32,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         if (_loadMoreStatus == LoadMoreStatus.IDLE) {
-          setState(() {
-            _loadMoreStatus = LoadMoreStatus.LOADING;
-          });
-          _pageNum++;
-          _loadData();
+          _loadMore();
         }
       }
     });
@@ -73,7 +69,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                     _pageNum = 1;
                     _loadData();
                   },
-                  child: ListView.builder(
+                  child: ListView.separated(
                     physics: AlwaysScrollableScrollPhysics(),
                     controller: _scrollController,
                     itemCount: _list.length + 1,
@@ -82,17 +78,39 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                         return Container(
                             height: 400, child: Center(child: Text('暂无数据')));
                       } else if (index == _list.length) {
-                        return LoadMoreView(loadMoreStatus: _loadMoreStatus);
+                        return LoadMoreView(
+                            loadMoreStatus: _loadMoreStatus,
+                            onLoadMoreClick: index > 8
+                                ? null
+                                : () {
+                                    _loadMore();
+                                  });
                       } else {
                         WordBean bean = _list[index];
-                        return ListTile(
-                          title: Text('${bean.contentEN}  ${bean.contentCN}'),
-                          onTap: () {
-                            _editWord(context, bean);
-                          },
-                        );
+                        return Dismissible(
+                            onDismissed: (_) {
+                              //参数暂时没有用到，则用下划线表示
+                              setState(() {
+                                _list.removeAt(index);
+                              });
+                            },
+                            // 监听
+                            movementDuration: Duration(milliseconds: 100),
+                            key: Key(bean.id.toString()),
+                            child: ListTile(
+                              title:
+                                  Text('${bean.contentEN}  ${bean.contentCN}'),
+                              onTap: () {
+                                _editWord(context, bean);
+                              },
+                            ),
+                            background: Container(
+                              color: Colors.black12,
+                            ));
                       }
                     },
+                    separatorBuilder: (BuildContext context, int index) =>
+                        Divider(height: 1.0, color: Colors.black12),
                   )))
         ]));
   }
@@ -157,5 +175,13 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         _addWord(context, wordBean);
       }
     }
+  }
+
+  void _loadMore() {
+    setState(() {
+      _loadMoreStatus = LoadMoreStatus.LOADING;
+    });
+    _pageNum++;
+    _loadData();
   }
 }

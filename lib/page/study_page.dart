@@ -26,6 +26,7 @@ class StudyPageState extends State<StudyPage>
   Widget build(BuildContext context) {
     super.build(context);
     var children = [
+      _buildTopTips(),
       DateSwitch(
         dateStr: _dateStr,
         callback: (dateStr) {
@@ -43,9 +44,6 @@ class StudyPageState extends State<StudyPage>
               )))
     ];
     if (_word != null) {
-      if (_revertEnable) {
-        children.insert(0, _buildTopTips());
-      }
       children.addAll([
         Padding(
             padding: EdgeInsets.only(top: 10.0, bottom: 100.0),
@@ -82,6 +80,7 @@ class StudyPageState extends State<StudyPage>
         '/api/v1/word/random',
         params: {'monthDate': _dateStr});
     setState(() {
+      _revertEnable = false;
       if (response.isSuccess() && response.data.isNotEmpty) {
         _showCN = false;
         _word = response.data[0];
@@ -126,22 +125,54 @@ class StudyPageState extends State<StudyPage>
     });
   }
 
-  Widget _buildTopTips() => Container(
-      color: Colors.black12,
-      child: Padding(
-          padding: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
-          child: Row(
-            children: <Widget>[
-              Text('确定认得该词？'),
-              GestureDetector(
-                onTap: () {
-                  if (_word != null) _markWord(_word.id, true);
-                },
-                child: Text(
-                  '记错了',
-                  style: TextStyle(color: MyColors.accentColor),
-                ),
-              )
-            ],
-          )));
+  ///透明度实现 invisible
+  Widget _buildTopTips() => Opacity(
+      opacity: _revertEnable ? 1.0 : 0.0,
+      child: Container(
+          color: Colors.black12,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 8.0),
+              child: Row(
+                children: <Widget>[
+                  Text('确定认得该词？'),
+                  GestureDetector(
+                    onTap: _revertEnable
+                        ? () {
+                            if (_word != null) _markWord(_word.id, true);
+                          }
+                        : null,
+                    child: Text(
+                      '记错了',
+                      style: TextStyle(color: MyColors.accentColor),
+                    ),
+                  ),
+                  Expanded(
+                      child: GestureDetector(
+                    onTap: _revertEnable
+                        ? () {
+                            if (_word != null) _deleteWord(_word.id);
+                          }
+                        : null,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Icon(Icons.delete_forever),
+                        Text(
+                          '太简单',
+                        )
+                      ],
+                    ),
+                  ))
+                ],
+              ))));
+
+  void _deleteWord(int id) async {
+    var response =
+        await HttpUtil().delete<ResultBean, int>('/api/v1/word/$id');
+    if (response.isSuccess()) {
+      _loadData();
+    } else {
+      Fluttertoast.showToast(msg: response.message);
+    }
+  }
 }
