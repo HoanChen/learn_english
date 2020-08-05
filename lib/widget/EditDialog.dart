@@ -6,8 +6,10 @@ import '../bean/WordBean.dart';
 
 class EditDialog extends Dialog {
   final WordBean word;
+  final Function confirmCallback;
 
-  EditDialog({Key key, @required this.word}) : super(key: key);
+  EditDialog({Key key, @required this.word, this.confirmCallback})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +47,29 @@ class EditDialog extends Dialog {
                       color: Color(0xffe0e0e0),
                       height: 1.0,
                     ),
-                    _buildInputText(_textEditControllerEN, _focusNodeEN,
-                        TextInputAction.next, 'English Word', (text) {
+                    _buildInputText(
+                        _textEditControllerEN,
+                        word.id == null,
+                        _focusNodeEN,
+                        TextInputAction.next,
+                        'English Word', (text) {
                       _focusNodeEN.unfocus();
                       FocusScope.of(context).requestFocus(_focusNodeCN);
                     }),
-                    _buildInputText(_textEditControllerCN, _focusNodeCN,
-                        TextInputAction.done, '汉语翻译', (text) {
+                    _buildInputText(_textEditControllerCN, word.id != null,
+                        _focusNodeCN, TextInputAction.done, '汉语翻译', (text) {
                       if (_textEditControllerEN.text.isNotEmpty) {
                         word
                           ..contentEN = _textEditControllerEN.text
                           ..contentCN = _textEditControllerCN.text;
-                        Navigator.pop(context, true);
+                        if (confirmCallback != null) {
+                          confirmCallback.call();
+                          _textEditControllerCN.clear();
+                          _textEditControllerEN.clear();
+                          _focusNodeCN.unfocus();
+                          FocusScope.of(context).requestFocus(_focusNodeEN);
+                        } else
+                          Navigator.pop(context, true);
                       } else {
                         Navigator.pop(context, false);
                       }
@@ -74,7 +87,15 @@ class EditDialog extends Dialog {
                                 word
                                   ..contentEN = _textEditControllerEN.text
                                   ..contentCN = _textEditControllerCN.text;
-                                Navigator.pop(context, true);
+                                if (confirmCallback != null) {
+                                  confirmCallback.call();
+                                  _textEditControllerCN.clear();
+                                  _textEditControllerEN.clear();
+                                  _focusNodeCN.unfocus();
+                                  FocusScope.of(context)
+                                      .requestFocus(_focusNodeEN);
+                                } else
+                                  Navigator.pop(context, true);
                               }
                             })
                           ],
@@ -98,6 +119,7 @@ class EditDialog extends Dialog {
 
   _buildInputText(
           TextEditingController controller,
+          bool focus,
           FocusNode focusNode,
           TextInputAction action,
           String hint,
@@ -110,7 +132,7 @@ class EditDialog extends Dialog {
               child: TextField(
                 focusNode: focusNode,
                 controller: controller,
-                autofocus: true,
+                autofocus: focus,
                 textInputAction: action,
                 keyboardType: TextInputType.text,
                 onSubmitted: valueChanged,
