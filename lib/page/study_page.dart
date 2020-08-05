@@ -35,7 +35,7 @@ class StudyPageState extends State<StudyPage>
         },
       ),
       SizedBox(
-          height: 150.0,
+          height: 100.0,
           child: Align(
               alignment: FractionalOffset.bottomCenter,
               child: Text(

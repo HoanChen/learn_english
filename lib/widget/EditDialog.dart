@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:learn_english/common/MyColors.dart';
+
 import '../bean/WordBean.dart';
 
 class EditDialog extends Dialog {
   final WordBean word;
 
   EditDialog({Key key, @required this.word}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final _textEditController = TextEditingController(
-        text: word.id != null ? word.contentCN : word.contentEN ?? '');
+    final _focusNodeEN = FocusNode();
+    final _focusNodeCN = FocusNode();
+    final _textEditControllerEN =
+        TextEditingController(text: word.contentEN ?? '');
+    final _textEditControllerCN =
+        TextEditingController(text: word.contentCN ?? '');
     return SingleChildScrollView(
         child: Material(
             type: MaterialType.transparency,
@@ -29,9 +36,7 @@ class EditDialog extends Dialog {
                         alignment: AlignmentDirectional.centerEnd,
                         children: <Widget>[
                           Center(
-                            child: Text(word.id != null
-                                ? '编辑汉译【${word.contentEN}】'
-                                : '新增单词'),
+                            child: Text(word.id != null ? '编辑' : '新增'),
                           )
                         ],
                       ),
@@ -40,8 +45,21 @@ class EditDialog extends Dialog {
                       color: Color(0xffe0e0e0),
                       height: 1.0,
                     ),
-                    _buildInputText(_textEditController, (text) {
-                      Navigator.pop(context, text);
+                    _buildInputText(_textEditControllerEN, _focusNodeEN,
+                        TextInputAction.next, 'English Word', (text) {
+                      _focusNodeEN.unfocus();
+                      FocusScope.of(context).requestFocus(_focusNodeCN);
+                    }),
+                    _buildInputText(_textEditControllerCN, _focusNodeCN,
+                        TextInputAction.done, '汉语翻译', (text) {
+                      if (_textEditControllerEN.text.isNotEmpty) {
+                        word
+                          ..contentEN = _textEditControllerEN.text
+                          ..contentCN = _textEditControllerCN.text;
+                        Navigator.pop(context, true);
+                      } else {
+                        Navigator.pop(context, false);
+                      }
                     }),
                     Container(
                         margin: EdgeInsets.only(right: 10.0),
@@ -49,13 +67,14 @@ class EditDialog extends Dialog {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             _buildBottomButton(context, false, () {
-                              Navigator.pop(context, null);
+                              Navigator.pop(context, false);
                             }),
                             _buildBottomButton(context, true, () {
-                              if (_textEditController.text.isEmpty) {
-                              } else {
-                                Navigator.pop(
-                                    context, _textEditController.text);
+                              if (_textEditControllerEN.text.isNotEmpty) {
+                                word
+                                  ..contentEN = _textEditControllerEN.text
+                                  ..contentCN = _textEditControllerCN.text;
+                                Navigator.pop(context, true);
                               }
                             })
                           ],
@@ -77,21 +96,36 @@ class EditDialog extends Dialog {
         ),
       );
 
-  _buildInputText(TextEditingController controller,
+  _buildInputText(
+          TextEditingController controller,
+          FocusNode focusNode,
+          TextInputAction action,
+          String hint,
           ValueChanged<String> valueChanged) =>
       Container(
-          constraints: BoxConstraints(minHeight: 130.0),
+          margin: EdgeInsets.only(top: 20.0, bottom: 20.0),
           child: Padding(
             padding: EdgeInsets.only(left: 30.0, right: 30.0),
             child: Center(
               child: TextField(
+                focusNode: focusNode,
                 controller: controller,
                 autofocus: true,
-                textInputAction: TextInputAction.done,
+                textInputAction: action,
                 keyboardType: TextInputType.text,
                 onSubmitted: valueChanged,
                 decoration: InputDecoration(
+                  hintText: hint,
                   contentPadding: EdgeInsets.fromLTRB(10, 0, 10, 15),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(3), //边角为5
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.black12, //边线颜色为白色
+                      width: 1, //边线宽度为2
+                    ),
+                  ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
                       Radius.circular(3), //边角为5

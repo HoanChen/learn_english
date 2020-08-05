@@ -53,6 +53,7 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         ),
         body: Column(children: [
           DateSwitch(
+            dateStr: _dateStr,
             callback: (dateStr) {
               _dateStr = dateStr;
               _pageNum = 1;
@@ -98,8 +99,8 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                             movementDuration: Duration(milliseconds: 100),
                             key: Key(bean.id.toString()),
                             child: ListTile(
-                              title:
-                                  Text('${bean.contentEN}  ${bean.contentCN}'),
+                              title: Text(
+                                  '${bean.contentEN}  ${bean.contentCN ?? ""}'),
                               onTap: () {
                                 _editWord(context, bean);
                               },
@@ -140,19 +141,17 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   }
 
   _editWord(BuildContext context, WordBean bean) async {
-    var cnStr = await showDialog<String>(
+    var ok = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) => EditDialog(word: bean),
     );
-    if (cnStr != null) {
-      var response = await HttpUtil().put<ResultBean, int>(
-          '/api/v1/word', WordBean(id: bean.id, contentCN: cnStr));
+    if (ok) {
+      var response =
+          await HttpUtil().put<ResultBean, int>('/api/v1/word', bean);
       Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
-        setState(() {
-          bean.contentCN = cnStr;
-        });
+        setState(() {});
       } else {
         _editWord(context, bean);
       }
@@ -160,17 +159,19 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   }
 
   _addWord(BuildContext context, WordBean wordBean) async {
-    var enStr = await showDialog<String>(
+    var ok = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) => EditDialog(word: wordBean),
     );
-    if (enStr != null) {
-      var wordBean = WordBean(contentEN: enStr);
-      var response =
-          await HttpUtil().post<ResultBean, int>('/api/v1/word', wordBean);
+    if (ok) {
+      var response = await HttpUtil().post<ResultBean, int>(
+          '/api/v1/word', wordBean..createTime = '$_dateStr-01');
       Fluttertoast.showToast(msg: response.message);
       if (response.isSuccess()) {
+        setState(() {
+          _list.add(wordBean..id = response.data);
+        });
       } else {
         _addWord(context, wordBean);
       }
