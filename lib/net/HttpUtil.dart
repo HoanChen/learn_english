@@ -26,6 +26,10 @@ class HttpUtil {
     }
   }
 
+  void setBaseUrl(String baseUrl) => _dio.options.baseUrl = baseUrl;
+
+  String getBaseUrl() => _dio.options.baseUrl;
+
   Future<O> simpleGet<O>(api, {params}) => request<O, O>(api, data: params);
 
   Future<R> get<R, O>(api, {params}) => request<R, O>(api, data: params);

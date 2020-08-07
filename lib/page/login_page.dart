@@ -9,6 +9,7 @@ import 'package:learn_english/bean/login_Info.dart';
 import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/widget/SingleLineEditDialog.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -80,8 +81,25 @@ class LoginState extends State<LoginPage> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text(
+                          '${HttpUtil().getBaseUrl()}',
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                        ),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                          child: RaisedButton(
+                            onPressed: () => _setUrl(),
+                            child: Text('设置环境'),
+                          ))
+                    ],
+                  ),
                   SizedBox(
-                    height: 120.0,
+                    height: 110.0,
                   ),
                   Text(
                     '学英语',
@@ -275,5 +293,23 @@ class LoginState extends State<LoginPage> {
       });
     }
     Fluttertoast.showToast(msg: msg);
+  }
+
+  void _setUrl() async {
+    var text = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SingleLineEditDialog(
+        title: '设置环境',
+        text: HttpUtil().getBaseUrl(),
+      ),
+    );
+    if (text != null &&
+        text.startsWith('http') &&
+        text != HttpUtil().getBaseUrl()) {
+      setState(() {
+        HttpUtil().setBaseUrl(text);
+      });
+    }
   }
 }
