@@ -183,7 +183,11 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
     Fluttertoast.showToast(msg: response.message);
     if (response.isSuccess()) {
       setState(() {
-        _list.add(wordBean..id = response.data);
+        _list.add(WordBean(
+            id: response.data,
+            contentEN: wordBean.contentEN,
+            contentCN: wordBean.contentCN,
+            createTime: wordBean.createTime));
       });
     } else {
       _addWord(context, wordBean);
