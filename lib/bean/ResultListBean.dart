@@ -6,8 +6,8 @@ import 'BeanFactory.dart';
 class ResultListBean<O> {
   static const CLASS_NAME = 'ResultListBean<dynamic>';
 
-  String code,message,serviceVersion;
-  List<O> data;
+  String code, message, serviceVersion;
+  List<O> dataList;
 
   ResultListBean.fromJson(Map<String, dynamic> json, DioError error) {
     if (error != null) {
@@ -17,11 +17,15 @@ class ResultListBean<O> {
       code = json['code'];
       message = json['message'];
       serviceVersion = json['serviceVersion'];
-      if (json['data'] != null) {
-        data = List<O>();
-        (json['data'] as List).forEach((element) {
-          data.add(BeanFactory.generateObject<O>(element));
-        });
+      var dataJson = json['data'];
+      if (dataJson != null) {
+        var dataListJson = dataJson['dataList'];
+        if (dataListJson != null) {
+          dataList = List<O>();
+          (dataListJson as List).forEach((element) {
+            dataList.add(BeanFactory.generateObject<O>(element));
+          });
+        }
       }
     }
   }

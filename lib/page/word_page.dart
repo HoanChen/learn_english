@@ -124,12 +124,12 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         if (_pageNum == 1) {
           _loadMoreStatus = LoadMoreStatus.IDLE;
           _list.clear();
-        } else if (response.data.length < 10) {
+        } else if (response.dataList.length < 10) {
           _loadMoreStatus = LoadMoreStatus.NO_MORE;
         } else {
           _loadMoreStatus = LoadMoreStatus.IDLE;
         }
-        _list.addAll(response.data);
+        _list.addAll(response.dataList);
       });
     } else {
       _pageNum--;

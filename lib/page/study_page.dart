@@ -5,7 +5,6 @@ import 'package:learn_english/bean/ResultBean.dart';
 import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/bean/WordMarkBean.dart';
-import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
 import 'package:learn_english/widget/DateSwitch.dart';
@@ -81,9 +80,9 @@ class StudyPageState extends State<StudyPage>
         params: {'monthDate': _dateStr});
     setState(() {
       _revertEnable = false;
-      if (response.isSuccess() && response.data.isNotEmpty) {
+      if (response.isSuccess() && response.dataList.isNotEmpty) {
         _showCN = false;
-        _word = response.data[0];
+        _word = response.dataList[0];
       } else {
         _word = null;
         Fluttertoast.showToast(msg: response.message);
@@ -110,11 +109,7 @@ class StudyPageState extends State<StudyPage>
 
   _markWord(int id, bool markUp) async {
     var response = await HttpUtil().post<ResultBean, Object>(
-        '/api/v1/word/mark',
-        WordMarkBean(
-            userId: LoginInfoUtil().getInfo().userBean.id,
-            wordId: id,
-            markUp: markUp));
+        '/api/v1/word/mark', WordMarkBean(wordId: id, markUp: markUp));
     setState(() {
       _revertEnable = !markUp;
       if (response.isSuccess()) {
@@ -167,12 +162,12 @@ class StudyPageState extends State<StudyPage>
               ))));
 
   void _deleteWord(int id) async {
-    var response =
-        await HttpUtil().delete<ResultBean, int>('/api/v1/word/$id');
-    if (response.isSuccess()) {
-      _loadData();
-    } else {
-      Fluttertoast.showToast(msg: response.message);
-    }
+    // var response =
+    //     await HttpUtil().delete<ResultBean, int>('/api/v1/word/$id');
+    // if (response.isSuccess()) {
+    _loadData();
+    // } else {
+    //   Fluttertoast.showToast(msg: response.message);
+    // }
   }
 }

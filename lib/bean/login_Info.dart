@@ -33,11 +33,9 @@ class RoleBean {
 }
 
 class UserBean {
-  int id;
   String userName, phone, email, avatar;
 
   UserBean.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
     userName = json['userName'];
     phone = json['phone'];
     email = json['email'];
@@ -45,7 +43,6 @@ class UserBean {
   }
 
   Map<String, dynamic> toJson() => Map<String, dynamic>()
-    ..['id'] = this.id
     ..['userName'] = this.userName
     ..['phone'] = this.phone
     ..['email'] = this.email
