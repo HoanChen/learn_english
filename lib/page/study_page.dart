@@ -80,9 +80,9 @@ class StudyPageState extends State<StudyPage>
         params: {'monthDate': _dateStr});
     setState(() {
       _revertEnable = false;
-      if (response.isSuccess() && response.dataList.isNotEmpty) {
+      if (response.isSuccess() && response.data.isNotEmpty) {
         _showCN = false;
-        _word = response.dataList[0];
+        _word = response.data[0];
       } else {
         _word = null;
         Fluttertoast.showToast(msg: response.message);

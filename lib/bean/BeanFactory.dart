@@ -2,6 +2,7 @@ import 'package:learn_english/bean/WordBean.dart';
 import 'package:learn_english/bean/login_Info.dart';
 
 import 'TokensBean.dart';
+import 'WordListBean.dart';
 
 class BeanFactory {
   static O generateObject<O>(json) {
@@ -12,6 +13,8 @@ class BeanFactory {
         return TokensBean.fromJson(json) as O;
       case WordBean.CLASS_NAME:
         return WordBean.fromJson(json) as O;
+      case WordListBean.CLASS_NAME:
+        return WordListBean.fromJson(json) as O;
       default:
         if (json is O) {
           return json;

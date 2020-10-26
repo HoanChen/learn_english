@@ -5,7 +5,7 @@ import 'package:learn_english/net/ResultUtil.dart';
 class ResultBean<O> {
   static const CLASS_NAME = 'ResultBean<dynamic>';
 
-  String code,message,serviceVersion;
+  String code, message, serviceVersion;
   O data;
 
   ResultBean.error(String message) {

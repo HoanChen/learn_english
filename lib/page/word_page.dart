@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/bean/WordBean.dart';
+import 'package:learn_english/bean/WordListBean.dart';
 import 'package:learn_english/net/HttpUtil.dart';
 import 'package:learn_english/widget/DateSwitch.dart';
 import 'package:learn_english/widget/EditDialog.dart';
@@ -117,19 +117,19 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   }
 
   Future<void> _loadData() async {
-    var response = await HttpUtil().get<ResultListBean, WordBean>(
+    var response = await HttpUtil().get<ResultBean, WordListBean>(
         '/api/v1/word/words/$_pageNum/$_pageSize/$_dateStr');
     if (response.isSuccess()) {
       setState(() {
         if (_pageNum == 1) {
           _loadMoreStatus = LoadMoreStatus.IDLE;
           _list.clear();
-        } else if (response.dataList.length < 10) {
+        } else if (response.data.dataList.length < 10) {
           _loadMoreStatus = LoadMoreStatus.NO_MORE;
         } else {
           _loadMoreStatus = LoadMoreStatus.IDLE;
         }
-        _list.addAll(response.dataList);
+        _list.addAll(response.data.dataList);
       });
     } else {
       _pageNum--;
