@@ -1,8 +1,7 @@
-import 'package:learn_english/bean/WordBean.dart';
-import 'package:learn_english/bean/login_Info.dart';
-
 import 'TokensBean.dart';
+import 'WordBean.dart';
 import 'WordListBean.dart';
+import 'login_Info.dart';
 
 class BeanFactory {
   static O generateObject<O>(json) {

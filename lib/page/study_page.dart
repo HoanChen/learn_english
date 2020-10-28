@@ -1,12 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/ResultListBean.dart';
-import 'package:learn_english/bean/WordBean.dart';
-import 'package:learn_english/bean/WordMarkBean.dart';
 import 'package:learn_english/common/MyColors.dart';
-import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/net/api/Api.dart';
+import 'package:learn_english/net/bean/WordBean.dart';
 import 'package:learn_english/widget/DateSwitch.dart';
 
 class StudyPage extends StatefulWidget {
@@ -74,20 +70,12 @@ class StudyPageState extends State<StudyPage>
     );
   }
 
-  Future<void> _loadData() async {
-    var response = await HttpUtil().get<ResultListBean, WordBean>(
-        '/api/v1/word/random',
-        params: {'monthDate': _dateStr});
-    setState(() {
-      _revertEnable = false;
-      if (response.isSuccess() && response.data.isNotEmpty) {
-        _showCN = false;
-        _word = response.data[0];
-      } else {
-        _word = null;
-        Fluttertoast.showToast(msg: response.message);
-      }
-    });
+  _loadData() {
+    Api.getInstance().wordApi.randomWord(_dateStr).then((value) => setState(() {
+          _revertEnable = false;
+          _word = value;
+          if (value != null) _showCN = false;
+        }));
   }
 
   @override
@@ -107,17 +95,13 @@ class StudyPageState extends State<StudyPage>
             style: TextStyle(color: Colors.white, fontSize: 18.0),
           ));
 
-  _markWord(int id, bool markUp) async {
-    var response = await HttpUtil().post<ResultBean, Object>(
-        '/api/v1/word/mark', WordMarkBean(wordId: id, markUp: markUp));
-    setState(() {
-      _revertEnable = !markUp;
-      if (response.isSuccess()) {
-        _showCN = true;
-      } else {
-        Fluttertoast.showToast(msg: response.message);
-      }
-    });
+  _markWord(int id, bool markUp) {
+    Api.getInstance().wordApi.markWord(id, markUp).then((value) => setState(() {
+          _revertEnable = !markUp;
+          if (value) {
+            _showCN = true;
+          }
+        }));
   }
 
   ///透明度实现 invisible
@@ -145,7 +129,12 @@ class StudyPageState extends State<StudyPage>
                       child: GestureDetector(
                     onTap: _revertEnable
                         ? () {
-                            if (_word != null) _deleteWord(_word.id);
+                            //TODO
+                            // if (_word != null)
+                            //   Api.getInstance()
+                            //       .wordApi
+                            //       .deleteWord(_word.id)
+                            //       .then((value) => {if (value) _loadData()});
                           }
                         : null,
                     child: Row(
@@ -160,14 +149,4 @@ class StudyPageState extends State<StudyPage>
                   ))
                 ],
               ))));
-
-  void _deleteWord(int id) async {
-    // var response =
-    //     await HttpUtil().delete<ResultBean, int>('/api/v1/word/$id');
-    // if (response.isSuccess()) {
-    _loadData();
-    // } else {
-    //   Fluttertoast.showToast(msg: response.message);
-    // }
-  }
 }

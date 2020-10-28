@@ -1,14 +1,8 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/login_Info.dart';
-import 'package:learn_english/common/LoginInfoUtil.dart';
 import 'package:learn_english/common/MyColors.dart';
 import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/net/api/Api.dart';
 import 'package:learn_english/widget/SingleLineEditDialog.dart';
 
 class LoginPage extends StatefulWidget {
@@ -176,7 +170,7 @@ class LoginState extends State<LoginPage> {
             _passwordFocusNode.unfocus();
             var _phoneNum = _phoneNumController.text;
             var _password = _passwordController.text;
-            doLogin(context, _phoneNum, _password);
+            _doLogin(context, _phoneNum, _password);
           },
           style: testStyle,
           obscureText: _isPwdObscure,
@@ -224,7 +218,7 @@ class LoginState extends State<LoginPage> {
             var _phoneNum = _phoneNumController.text;
             var _password = _passwordController.text;
             if (!_loading) {
-              doLogin(context, _phoneNum, _password);
+              _doLogin(context, _phoneNum, _password);
             }
           },
           child: Text(
@@ -266,33 +260,16 @@ class LoginState extends State<LoginPage> {
       ));
 
   /* 登录操作 */
-  doLogin(BuildContext context, String _phoneNum, String password) async {
+  _doLogin(BuildContext context, String phoneNum, String password) {
     setState(() {
       _loading = true;
     });
-    FormData formData = FormData.fromMap({
-      'phone': _phoneNum,
-      'password': base64Encode(utf8.encode(password)),
-    });
-    var response = await HttpUtil()
-        .post<ResultBean, LoginInfoBean>('/api/v1/user/login', formData);
-    var msg = response.message;
-    if (response.isSuccess()) {
-      var success = await LoginInfoUtil().setLoginInfo(response.data);
-      if (success) {
-        Navigator.of(context).pushReplacementNamed('./main');
-      } else {
-        msg = '登录失败';
-        setState(() {
-          _loading = false;
-        });
-      }
-    } else {
+    Api.getInstance().loginApi.login(phoneNum, password).then((value) {
       setState(() {
         _loading = false;
       });
-    }
-    Fluttertoast.showToast(msg: msg);
+      if (value) Navigator.of(context).pushReplacementNamed('./main');
+    });
   }
 
   void _setUrl() async {

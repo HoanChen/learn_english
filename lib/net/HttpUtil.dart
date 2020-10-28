@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:learn_english/bean/BeanFactory.dart';
-import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/ResultListBean.dart';
 import 'package:learn_english/common/Constants.dart';
 
 import 'TokenInterceptor.dart';
+import 'bean/BeanFactory.dart';
+import 'bean/ResultBean.dart';
+import 'bean/ResultListBean.dart';
 
 class HttpUtil {
   static final HttpUtil _instance = HttpUtil._internal();

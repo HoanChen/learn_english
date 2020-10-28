@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:learn_english/bean/TokenBean.dart';
-import 'package:learn_english/bean/TokensBean.dart';
-import 'package:learn_english/bean/login_Info.dart';
+import 'package:learn_english/net/bean/TokenBean.dart';
+import 'package:learn_english/net/bean/TokensBean.dart';
+import 'package:learn_english/net/bean/login_Info.dart';
 
 import 'Constants.dart';
 import 'StorageUtil.dart';

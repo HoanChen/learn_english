@@ -1,10 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/WordBean.dart';
-import 'package:learn_english/bean/WordListBean.dart';
-import 'package:learn_english/net/HttpUtil.dart';
+import 'package:learn_english/net/api/Api.dart';
+import 'package:learn_english/net/bean/WordBean.dart';
 import 'package:learn_english/widget/DateSwitch.dart';
 import 'package:learn_english/widget/EditDialog.dart';
 import 'package:learn_english/widget/load_more_view.dart';
@@ -20,7 +17,6 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
   String _dateStr;
   var _list = [];
   var _pageNum = 1;
-  var _pageSize = 10;
   var _loadMoreStatus = LoadMoreStatus.IDLE;
   ScrollController _scrollController;
 
@@ -32,7 +28,11 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         if (_loadMoreStatus == LoadMoreStatus.IDLE) {
-          _loadMore();
+          setState(() {
+            _loadMoreStatus = LoadMoreStatus.LOADING;
+          });
+          _pageNum++;
+          _loadData();
         }
       }
     });
@@ -84,7 +84,11 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
                             onLoadMoreClick: index > 8
                                 ? null
                                 : () {
-                                    _loadMore();
+                                    setState(() {
+                                      _loadMoreStatus = LoadMoreStatus.LOADING;
+                                    });
+                                    _pageNum++;
+                                    _loadData();
                                   });
                       } else {
                         WordBean bean = _list[index];
@@ -116,36 +120,29 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         ]));
   }
 
-  Future<void> _loadData() async {
-    var response = await HttpUtil().get<ResultBean, WordListBean>(
-        '/api/v1/word/words/$_pageNum/$_pageSize/$_dateStr');
-    if (response.isSuccess()) {
-      setState(() {
-        if (_pageNum == 1) {
-          _loadMoreStatus = LoadMoreStatus.IDLE;
-          _list.clear();
-        } else if (response.data.dataList.length < 10) {
-          _loadMoreStatus = LoadMoreStatus.NO_MORE;
-        } else {
-          _loadMoreStatus = LoadMoreStatus.IDLE;
-        }
-        _list.addAll(response.data.dataList);
-      });
-    } else {
-      _pageNum--;
-      Fluttertoast.showToast(msg: response.message);
-      setState(() {
-        _loadMoreStatus = LoadMoreStatus.IDLE;
-      });
-    }
-  }
-
-  void _loadMore() {
-    setState(() {
-      _loadMoreStatus = LoadMoreStatus.LOADING;
-    });
-    _pageNum++;
-    _loadData();
+  void _loadData() {
+    Api.getInstance()
+        .wordApi
+        .loadWords(pageNum: _pageNum, dateStr: _dateStr)
+        .then((value) => {
+              if (value != null)
+                setState(() {
+                  if (_pageNum == 1) {
+                    _loadMoreStatus = LoadMoreStatus.IDLE;
+                    _list.clear();
+                  } else if (value.length < 10) {
+                    _loadMoreStatus = LoadMoreStatus.NO_MORE;
+                  } else {
+                    _loadMoreStatus = LoadMoreStatus.IDLE;
+                  }
+                  _list.addAll(value);
+                })
+              else
+                setState(() {
+                  _pageNum--;
+                  _loadMoreStatus = LoadMoreStatus.IDLE;
+                })
+            });
   }
 
   _editWord(BuildContext context, WordBean bean) async {
@@ -154,17 +151,9 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
       barrierDismissible: false,
       builder: (context) => EditDialog(word: bean),
     );
-    if (ok) _doEditWord(bean);
-  }
-
-  void _doEditWord(WordBean bean) async {
-    var response = await HttpUtil().put<ResultBean, int>('/api/v1/word', bean);
-    Fluttertoast.showToast(msg: response.message);
-    if (response.isSuccess()) {
-      setState(() {});
-    } else {
-      _editWord(context, bean);
-    }
+    if (ok)
+      Api.getInstance().wordApi.editWord(bean).then((value) =>
+          {if (value) setState(() {}) else _editWord(context, bean)});
   }
 
   _addWord(BuildContext context, WordBean wordBean) {
@@ -173,24 +162,21 @@ class WordPageState extends State<WordPage> with AutomaticKeepAliveClientMixin {
         barrierDismissible: false,
         builder: (context) => EditDialog(
               word: wordBean,
-              confirmCallback: () => _doAddWord(wordBean),
+              confirmCallback: () => Api.getInstance()
+                  .wordApi
+                  .addWord(wordBean, _dateStr)
+                  .then((value) => {
+                        if (value != null)
+                          setState(() {
+                            _list.add(WordBean(
+                                id: value,
+                                contentEN: wordBean.contentEN,
+                                contentCN: wordBean.contentCN,
+                                createTime: wordBean.createTime));
+                          })
+                        else
+                          _addWord(context, wordBean)
+                      }),
             ));
-  }
-
-  _doAddWord(WordBean wordBean) async {
-    var response = await HttpUtil().post<ResultBean, int>(
-        '/api/v1/word', wordBean..createTime = '$_dateStr-01');
-    Fluttertoast.showToast(msg: response.message);
-    if (response.isSuccess()) {
-      setState(() {
-        _list.add(WordBean(
-            id: response.data,
-            contentEN: wordBean.contentEN,
-            contentCN: wordBean.contentCN,
-            createTime: wordBean.createTime));
-      });
-    } else {
-      _addWord(context, wordBean);
-    }
   }
 }

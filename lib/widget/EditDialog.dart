@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:learn_english/common/MyColors.dart';
-
-import '../bean/WordBean.dart';
+import 'package:learn_english/net/bean/WordBean.dart';
 
 class EditDialog extends Dialog {
   final WordBean word;

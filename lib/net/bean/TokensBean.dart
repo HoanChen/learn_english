@@ -1,4 +1,4 @@
-import 'package:learn_english/bean/TokenBean.dart';
+import 'TokenBean.dart';
 
 class TokensBean {
   static const CLASS_NAME = 'TokensBean';

@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:learn_english/bean/ResultBean.dart';
-import 'package:learn_english/bean/TokenBean.dart';
-import 'package:learn_english/bean/TokensBean.dart';
 import 'package:learn_english/common/Constants.dart';
 import 'package:learn_english/common/LoginInfoUtil.dart';
-import 'package:learn_english/net/HttpUtil.dart';
 
 import '../main.dart';
+import 'HttpUtil.dart';
+import 'bean/ResultBean.dart';
+import 'bean/TokenBean.dart';
+import 'bean/TokensBean.dart';
 
 ///添加token认证head,提前判断失效并主动刷新
 class TokenInterceptor extends InterceptorsWrapper {

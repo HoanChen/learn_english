@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:learn_english/net/ResultUtil.dart';
 
+import '../ResultUtil.dart';
 import 'BeanFactory.dart';
 
 class ResultListBean<O> {

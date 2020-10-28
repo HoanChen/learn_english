@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:learn_english/bean/BeanFactory.dart';
-import 'package:learn_english/net/ResultUtil.dart';
+
+import '../ResultUtil.dart';
+import 'BeanFactory.dart';
 
 class ResultBean<O> {
   static const CLASS_NAME = 'ResultBean<dynamic>';
